@@ -6,7 +6,7 @@ import flet as ft
 from components import InputText, Button
 
 
-class create_login(UserControl):
+class create_signup(UserControl):
     def __init__(self) -> None:
         self.page = ft.Page
         super().__init__()
@@ -19,7 +19,7 @@ class create_login(UserControl):
             content=Container(
                 padding=padding.only(10, 30, 10, 30),
                 width=400,
-                height=400,
+                height=550,
                 border_radius=border_radius.all(10),
                 bgcolor='#1D242D',
 
@@ -27,20 +27,23 @@ class create_login(UserControl):
                     Container(
                         margin=margin.only(bottom=20),
                         content=Text(
-                            "Welcome Back!",
+                            "Get Started!",
                             size=30,
                             color='#ffffff',
                             weight='bold',
                         ),
                     ),
+                    InputText('First name', False),
+                    InputText('Last name', False),
                     InputText('Email', False),
                     InputText('Password', True),
-                    Button('Log In'),
+                    InputText('Confirm password', True),
+                    Button('Sign Up'),
                     Container(
                         margin=margin.only(bottom=20),
                         on_click=lambda _:ft.Page.go(f'/secondpage'),
                         content=Text(
-                            "Sign Up",
+                            "Log in",
                             size=12,
                             color='#666C75',
                             weight='bold',

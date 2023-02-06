@@ -1,19 +1,17 @@
 from flet import *
 import flet as ft
-import login
+import signup
 
 
 def main(page: ft.Page):
-    chat = ft.Column()
-    new_message = ft.TextField()
 
-    def send_click(e):
-        chat.controls.append(ft.Text(new_message.value))
-        new_message.value = ""
-        page.update()
+    def route_change(e):
+        page.views.clear()
 
+    page.padding = 0
+    page.spacing = 0
     page.add(
-        login.section
+        signup.create_signup().create_component()
     )
 
 
