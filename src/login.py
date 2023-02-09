@@ -41,7 +41,22 @@ class create_login(UserControl):
                         ),
                         InputText('Email', False, 250),
                         InputText('Password', True, 250),
-                        Button('Log In'),
+                        Container(
+                            alignment=alignment.center,
+                            margin=margin.only(top=15),
+                            content=ElevatedButton(
+                                on_click=lambda _:self.page.go('/home'),
+                                content=Text(
+                                    'Log In',
+                                    size=15,
+                                    weight='bold',
+                                    color="white"
+                                ),
+                                height=48,
+                                width=180,
+                                bgcolor='blue'
+                            )
+                        ),
                         Container(
                             margin=margin.only(bottom=20),
                             on_click=lambda _:self.page.go('/signup'),
