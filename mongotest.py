@@ -5,13 +5,13 @@ client = MongoClient(
 
 db = client.get_database('Soundtify')
 records = db.Usuarios
-print(records.count_documents({}))
+# print(records.count_documents({}))
 
 #           INSERT
 # records.insert_one({*JSON FILE*})
 
 #           READ
-print(list(records.find()))
+results = records.find({}, {'nombre':1,'email':1,'contraseña':1, '_id':0})
 
 #           UPDATE
 
@@ -20,3 +20,8 @@ print(list(records.find()))
 
 #           DELETE
 # records.delete_one({})
+
+
+for result in results:
+    values = list(result.values())
+    print(values)

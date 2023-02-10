@@ -69,7 +69,8 @@ class create_homepage(UserControl):
             alignment=alignment.center,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            bgcolor='blue',
+            margin=10,
+            bgcolor='#1D242D',
             content=Text('PAGE 1', size=50)
         )
 
@@ -77,7 +78,8 @@ class create_homepage(UserControl):
             alignment=alignment.center,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            bgcolor='green',
+            margin=10,
+            bgcolor='#1D242D',
             content=Text('PAGE 2', size=50)
         )
 
@@ -85,7 +87,8 @@ class create_homepage(UserControl):
             alignment=alignment.center,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            bgcolor='orange',
+            margin=10,
+            bgcolor='#1D242D',
             content=Text('PAGE 3', size=50),
         )
 
@@ -129,7 +132,7 @@ class create_homepage(UserControl):
                             alignment='center',
                             controls=[
                                 Container(
-                                    height=500,
+                                    height=100,
                                     content=Row(
                                         spacing=0,
                                         controls=[
@@ -146,29 +149,24 @@ class create_homepage(UserControl):
                                                         indicator,
                                                     ]
                                                 ),
-
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Stack(
-                                                    controls=[
-                                                        page1,
-                                                        page2,
-                                                        page3,
-
-                                                    ]
-                                                )
                                             ),
                                         ]
                                     )
-                                ),
+                                )
                             ]
                         )
                     ),
                     Container(
-                        border=border.only(right=border.BorderSide(
-                            width=1, color='#22888888'),),
-                    )
+                        expand=True,
+                        content=Stack(
+                            controls=[
+                                page1,
+                                page2,
+                                page3,
+
+                            ]
+                        )
+                    ),
                 ]
             )
 
