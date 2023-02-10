@@ -25,7 +25,7 @@ class create_signup(UserControl):
                 Container(
                     padding=padding.only(10, 30, 10, 30),
                     width=400,
-                    height=500,
+                    height=550,
                     border_radius=border_radius.all(10),
                     bgcolor='#1D242D',
 
@@ -33,25 +33,26 @@ class create_signup(UserControl):
                         Container(
                             margin=margin.only(bottom=20),
                             content=Text(
-                                "Get Started!",
+                                "¡Comencemos!",
                                 size=30,
                                 color='#ffffff',
                                 weight='bold',
                             ),
                         ),
                         Row([
-                            InputText('First name', False, 120),
-                            InputText('Last name', False, 120),
+                            InputText('Nombre', False, 120),
+                            InputText('Apellido', False, 120),
                         ], alignment='center'),
-                        InputText('Email', False, 250),
-                        InputText('Password', True, 250),
-                        InputText('Confirm password', True, 250),
-                        Button('Sign Up'),
+                        InputText('Usuario', False, 250),
+                        InputText('Correo', False, 250),
+                        InputText('Contraseña', True, 250),
+                        InputText('Confirmar contraseña', True, 250),
+                        Button('Registrarse'),
                         Container(
                             margin=margin.only(bottom=20),
                             on_click=lambda _:self.page.go('/'),
                             content=Text(
-                                "Log in",
+                                "Iniciar sesión",
                                 size=12,
                                 color='#666C75',
                                 weight='bold',

@@ -3,19 +3,16 @@ from flet import alignment, margin, border_radius
 
 
 def InputText(text: str, hide: bool, width_par: int):
-    return Container(
-        alignment=alignment.center,
-        content=TextField(
-            label=text,
-            label_style=TextStyle(color='#666C75'),
-            color='white',
-            height=48,
-            width=width_par,
-            bgcolor='#1D242D',
-            filled=True,
-            border_color='#666C75',
-            password=hide,
-        )
+    return TextField(
+        label=text,
+        label_style=TextStyle(color='#666C75'),
+        color='white',
+        height=48,
+        width=width_par,
+        bgcolor='#1D242D',
+        filled=True,
+        border_color='#666C75',
+        password=hide,
     )
 
 

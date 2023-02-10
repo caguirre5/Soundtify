@@ -1,13 +1,15 @@
 from random import choice
 from flet import *
 import flet as ft
-from flet import animation, alignment, border, transform
+from flet import animation, alignment, border, transform, padding
+
+from src.feed import create_feed
 
 
 class create_homepage(UserControl):
     def __init__(self, page):
         super().__init__()
-        self.page = ft.Page
+        self.page = page
         self.animation_style = animation.Animation(
             500, curve='decelerate')
 
@@ -66,20 +68,20 @@ class create_homepage(UserControl):
         )
 
         page1 = Container(
+            padding=padding.only(top=10),
             alignment=alignment.center,
+            expand=True,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            margin=10,
-            bgcolor='#1D242D',
-            content=Text('PAGE 1', size=50)
+            bgcolor='#15191E',
+            content=create_feed(self.page)
         )
 
         page2 = Container(
             alignment=alignment.center,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            margin=10,
-            bgcolor='#1D242D',
+            bgcolor='#15191E',
             content=Text('PAGE 2', size=50)
         )
 
@@ -87,8 +89,7 @@ class create_homepage(UserControl):
             alignment=alignment.center,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
-            margin=10,
-            bgcolor='#1D242D',
+            bgcolor='#15191E',
             content=Text('PAGE 3', size=50),
         )
 
@@ -119,7 +120,7 @@ class create_homepage(UserControl):
 
         return Container(
             expand=True,
-            bgcolor='#15191E',
+            bgcolor='#1D242D',
             content=Row(
                 spacing=0,
                 controls=[
@@ -132,7 +133,7 @@ class create_homepage(UserControl):
                             alignment='center',
                             controls=[
                                 Container(
-                                    height=100,
+                                    height=500,
                                     content=Row(
                                         spacing=0,
                                         controls=[
@@ -160,9 +161,9 @@ class create_homepage(UserControl):
                         expand=True,
                         content=Stack(
                             controls=[
-                                page1,
-                                page2,
                                 page3,
+                                page2,
+                                page1,
 
                             ]
                         )

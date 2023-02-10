@@ -11,7 +11,8 @@ records = db.Usuarios
 # records.insert_one({*JSON FILE*})
 
 #           READ
-results = records.find({}, {'nombre':1,'email':1,'contraseña':1, '_id':0})
+results = records.find(
+    {}, {'nombre': 1, 'email': 1, 'contraseña': 1, '_id': 0}).limit(10)
 
 #           UPDATE
 
@@ -20,8 +21,26 @@ results = records.find({}, {'nombre':1,'email':1,'contraseña':1, '_id':0})
 
 #           DELETE
 # records.delete_one({})
-
-
+results = list(results)
 for result in results:
-    values = list(result.values())
+    values = (result['nombre'])
     print(values)
+
+
+# Collections
+user = db['Usuarios']
+music = db.Musica
+record = db.Reproducciones
+
+# Queries
+# username = "paoDeLeon"
+# contra = "pao123"
+
+# validateUser = {"username": username, "contraseña": contra}
+# resValidateUser = True if (len(list(user.find(validateUser))) > 0) else False
+
+# print(resValidateUser)
+projection = {'nombre': 1, 'email': 1, '_id': 0}
+results = records.find(
+    {}, projection).limit(10)
+print(list(results))

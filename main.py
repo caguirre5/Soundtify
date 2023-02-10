@@ -9,11 +9,11 @@ def main(page: ft.Page):
         print(page.route)
         page.views.clear()
         page.views.append(
-            views_handler(page)[page.route]
+            views_handler(page).get_dictionary()[page.route]
         )
 
     page.on_route_change = route_change
-    page.go('/')
+    page.go('/home')
 
 
 ft.app(target=main, assets_dir='assets', view=ft.WEB_BROWSER)
