@@ -13,7 +13,7 @@ def main(page: ft.Page):
         )
 
     page.on_route_change = route_change
-    page.go('/')
+    page.go('/home')
 
 
 ft.app(target=main, assets_dir='assets', view=ft.WEB_BROWSER)
