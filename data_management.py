@@ -1,12 +1,13 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
+
 client = MongoClient(
     "mongodb+srv://soundtify:soundtify@soundtify.jylzfjo.mongodb.net/?retryWrites=true&w=majority")
 db = client.get_database('Soundtify')
 
 
-def getField(n):
+def getField(n, projection):
     records = db.Musica
-    projection = {'titulo': 1, 'artista': 1, '_id': 0}
     results = records.find(
         {}, projection).skip(n).limit(10)
 
@@ -21,15 +22,19 @@ def authentication(username, password):
     return resValidateUser
 
 
-def newLike(id):
+def newLike(songId):
     # Sumarle al contador de like
-    songId = "63e06468a71edf4395ebe945"
-    # song = {"_id": ObjectId(songId)}
+    song = {"_id": ObjectId(songId)}
     increaseLike = {"$inc": {"likes": 1}}
-    # print(db.Musica.update_one(song, increaseLike))
+    db.Musica.update_one(song, increaseLike)
 
+def popLike(songId):
+    # Sumarle al contador de like
+    song = {"_id": ObjectId(songId)}
+    increaseLike = {"$inc": {"likes": -1}}
+    db.Musica.update_one(song, increaseLike)
 
 def getValue(collection, validation):
     col = db[collection]
     queryResult = col.find(validation)
-    return list(queryResult)
+    return list(queryResult)[0]

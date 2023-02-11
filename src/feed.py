@@ -23,20 +23,28 @@ class create_feed(UserControl):
                 )
             ]
         )
+        self.recomendation = Container(
+            expand=True,
+            margin=margin.only(left=10,right=10,bottom=10),
+            bgcolor='blue',
+        )
         self.n = 0
         self.getSongs(self.n)
 
     def getSongs(self, n):
-        SongList = getField(n)
+        SongList = getField(n, {'titulo': 1, 'artista': 1, '_id': 1})
         for Song in SongList:
             print(Song['titulo'])
             self.feed.controls.insert(-1, create_post(
-                page, Song['titulo'], Song['artista']))
+                page, Song['titulo'], Song['artista'], Song['_id']))
         if n > 0:
             print(n)
-            self.page.update()
+            self.feed.update()
         self.n += 10
 
     def build(self):
-
-        return self.feed
+ 
+        return Row([
+            self.feed,
+            self.recomendation
+        ])
