@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from data_management import getValue
+from src.test import create_page
 
 client = MongoClient(
     "mongodb+srv://soundtify:soundtify@soundtify.jylzfjo.mongodb.net/?retryWrites=true&w=majority")
@@ -10,18 +11,50 @@ user = db.Usuarios
 music = db.Musica
 
 
-def authentication(username, password):
-    user = db.Usuarios
-    validateUser = {"username": username, "contraseña": password}
+myTopArtists = [
+    {"$match": {"username": "paoDeLeon"}},
+    {
+        "$lookup":
+        {
+            "from": "Reproducciones",
+            "localField": "username",
+            "foreignField": "username",
+            "pipeline": [
+                {'$project': {"_id": 0, "IdMusica": 1}}
+            ],
+            "as": "Listners"
+        }
+    },
+    {
+        "$lookup":
+        {
+            "from": "Musica",
+            "localField": "Listners.IdMusica",
+            "foreignField": "_id",
+            "pipeline": [
+                {"$project": {"artista": 1, "_id": 0}}
+            ],
+            "as": "reps"
+        }
+    },
+    {
+        "$unwind": "$reps"
+    },
+    {
+        "$group":
+        {
+            "_id": "$reps.artista",
+            "count": {"$sum": 1}
+        }
+    },
+    {
+        "$sort": {"count": -1}
+    },
+    {
+        "$limit": 5
+    }
+]
 
-    print(list(user.find(validateUser)))
-    resValidateUser = True if (
-        len(list(user.find(validateUser))) > 0) else False
-    print(list(user.find(validateUser, {'_id': 1})))
-    userID = 0
-    return resValidateUser, userID
-
-
-res, ID = authentication('paoDeLeon', 'pao123')
-print(res)
-print(ID)
+resMyTopArtists = user.aggregate(myTopArtists)
+results = list(resMyTopArtists)
+create_page(results)

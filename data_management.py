@@ -105,6 +105,12 @@ def addUser(nombre, apellido, region, username, email, contrasenia, sexo):
         resInsertUser = False
 
 
+def addFollower(username):
+    user_to_follow = {"username": username}
+    incfollowers = {"$inc": {"Seguidores": 1}}
+    user.update_one(user_to_follow, incfollowers)
+
+
 def delSong(cancionId):
     DeleteSong = {"_id": ObjectId(cancionId)}
     DeleteRecord = {"IdMusica":  ObjectId(cancionId)}
@@ -140,3 +146,20 @@ def deleteComment(username, comment, songId):
     DeleteComent = {"$pull": {"comentarios": {
         "comentario": comment, "username": username}}}
     music.update_one(song, DeleteComent)
+
+
+def deleteUser(username):
+    DeleteUser = {"username": username}
+    DeleteUserSongs = {"artista": username}
+    record.delete_many(DeleteUser)
+    music.delete_many(DeleteUserSongs)
+    user.delete_one(DeleteUser)
+    print('usuario {} eliminado'.format(username))
+
+
+def editUsername(old_username, new_username):
+
+    user_name = {"username": old_username}
+    changeUsername = {"$set": {"username": new_username}}
+
+    user.update_one(user_name, changeUsername)

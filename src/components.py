@@ -13,6 +13,7 @@ def InputText(text: str, hide: bool, width_par: int):
         filled=True,
         border_color='#666C75',
         password=hide,
+        can_reveal_password=hide
     )
 
 

@@ -4,7 +4,7 @@ from flet import border_radius, alignment, padding, margin, border_radius, dropd
 import flet as ft
 
 from src.components import InputText, Button
-from data_management import addUser, userExistence
+from data_management import addUser, userExistence, getValue
 
 
 class create_signup(UserControl):
@@ -23,6 +23,7 @@ class create_signup(UserControl):
                 Radio(value=1, label="Mujer", fill_color='blue'),
             ], alignment='center')
         )
+        self.userId = None
 
     def addUserFunc(self):
         authValue = userExistence(self.user.value)
@@ -35,7 +36,8 @@ class create_signup(UserControl):
         else:
             addUser(self.firstName.value, self.lastName.value, self.pais.value, self.user.value,
                     self.email.value, self.password.value, self.sexo.value)
-            print('cuenta agregada')
+            # self.userId = getValue('Usuario', {'username': self.user})['_id']
+            self.page.go('/-')
 
     def build(self):
         return Container(
