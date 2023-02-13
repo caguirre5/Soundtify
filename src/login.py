@@ -14,12 +14,23 @@ class create_login(UserControl):
         self.UserInput = InputText('Usuario', False, 250)
         self.PassInput = InputText('Contraseña', True, 250)
 
+    def getUserID(self):
+        return self.UserID
+
     def auth(self):
-        authValue = authentication(self.UserInput.value, self.PassInput.value)
-        if authValue:
-            self.page.go('/home')
-        else:
-            self.page.go('/')
+        try:
+            authValue, userID = authentication(
+                self.UserInput.value, self.PassInput.value)
+            if authValue:
+                self.page.go('/home-{}'.format(userID))
+            else:
+                self.page.go('/-')
+        except:
+            self.page.snack_bar = SnackBar(
+                ft.Text(f"Usuario no encontrado"))
+            self.page.snack_bar.open = True
+            self.page.snack_bar.bgcolor = 'red'
+            self.page.update()
 
     def build(self):
         return Container(
@@ -75,7 +86,7 @@ class create_login(UserControl):
                         ),
                         Container(
                             margin=margin.only(bottom=20),
-                            on_click=lambda _:self.page.go('/signup'),
+                            on_click=lambda _:self.page.go('/signup-'),
                             content=Text(
                                 "Registrarse",
                                 size=12,

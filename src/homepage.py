@@ -4,12 +4,14 @@ import flet as ft
 from flet import animation, alignment, border, transform, padding
 
 from src.feed import create_feed
+from src.profilepage import create_page
 
 
 class create_homepage(UserControl):
-    def __init__(self, page):
+    def __init__(self, page, userID):
         super().__init__()
         self.page = page
+        self.userID = userID
         self.animation_style = animation.Animation(
             500, curve='decelerate')
 
@@ -68,13 +70,12 @@ class create_homepage(UserControl):
         )
 
         page1 = Container(
-            padding=padding.only(top=10),
             alignment=alignment.center,
             expand=True,
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
             bgcolor='#15191E',
-            content=create_feed(self.page)
+            content=create_feed(self.page, self.userID)
         )
 
         page2 = Container(
@@ -90,7 +91,7 @@ class create_homepage(UserControl):
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
             bgcolor='#15191E',
-            content=Text('PAGE 3', size=50),
+            content=create_page(self.page, self.userID)
         )
 
         switch_control = {
@@ -161,9 +162,9 @@ class create_homepage(UserControl):
                         expand=True,
                         content=Stack(
                             controls=[
-                                page3,
                                 page2,
                                 page1,
+                                page3,
 
                             ]
                         )
