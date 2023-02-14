@@ -1,8 +1,9 @@
 from flet import *
 from flet import icons, alignment, padding, border, border_radius, transform, margin
 import flet as ft
-from data_management import addFollower, deleteUser, editUsername, getFieldNoLimit, getValue, addSong, timeCast, delSong
+from data_management import setPhoto, authPhoto, addFollower, deleteUser, editUsername, getFieldNoLimit, getValue, addSong, timeCast, delSong
 from bson.objectid import ObjectId
+from photoGenerator import CreatePhoto
 
 
 class create_page(UserControl):
@@ -34,6 +35,19 @@ class create_page(UserControl):
         self.followers = getValue('Usuarios', {'_id': ObjectId(self.userID)})[
             'Seguidores']
         self.songs = Column(scroll='auto')
+        self.circleAvatarContent = None
+        # if authPhoto(self.username):
+        #     setPhoto(self.username)
+        #     self.circleAvatarContent = CircleAvatar(
+        #         radius=50,
+        #         content=Image(src='../assets/image.jpeg', fit='contain')
+        #     )
+        # else:
+        #     self.circleAvatarContent = CircleAvatar(
+        #         radius=50,
+        #         content=Text('{}{}'.format(
+        #             self.firstname[0], self.lastname[0]), color='white', size=30)
+        #     )
 
         self.users = Column()
         self.editIcon = IconButton(
@@ -252,11 +266,11 @@ class create_page(UserControl):
         self.section3 = Container(
             margin=margin.only(left=0, top=10, right=10, bottom=10),
             width=500,
-            height=400,
             content=Column([
                 self.barraBusqueda,
                 self.users,
-            ])
+            ]
+            )
         )
 
         self.getSongs()
@@ -266,9 +280,10 @@ class create_page(UserControl):
         self.followersNum.update()
 
     def buscarUsuario(self):
-        usuario = getValue(
-            'Usuarios', {'username': self.barraBusqueda.value})
-        if usuario:
+        self.users.controls.clear()
+        try:
+            usuario = getValue(
+                'Usuarios', {'username': self.barraBusqueda.value})
             self.users.controls.append(
                 Card(
                     elevation=30,
@@ -304,12 +319,17 @@ class create_page(UserControl):
                     )
                 )
             )
+            self.barraBusqueda.value = ''
+            self.barraBusqueda.update()
             self.users.update()
-        else:
+        except:
             self.page.snack_bar = SnackBar(
                 ft.Text(f"No se encontro ningun usuario"))
             self.page.snack_bar.open = True
             self.page.snack_bar.bgcolor = 'red'
+            self.barraBusqueda.value = ''
+            self.barraBusqueda.update()
+            self.users.update()
             self.page.update()
 
     def edit_username(self, n):
@@ -387,7 +407,7 @@ class create_page(UserControl):
 
     def openDlg2(self):
         self.page.dialog = self.alertaDeleteUser
-        self.alertaDelete.open = True
+        self.alertaDeleteUser.open = True
         self.page.update()
 
     def closeDlg(self, e):
@@ -436,13 +456,13 @@ class create_page(UserControl):
                                             on_click=lambda _: self.openDlg(
                                                 song['_id'])
                                         ),
-                                        IconButton(
-                                            icon='edit',
-                                            icon_color='white',
-                                            icon_size=20,
-                                            on_click=lambda _: self.change_song_status(
-                                                container)
-                                        ),
+                                        # IconButton(
+                                        #     icon='edit',
+                                        #     icon_color='white',
+                                        #     icon_size=20,
+                                        #     on_click=lambda _: self.change_song_status(
+                                        #         container)
+                                        # ),
                                     ]
                                 )
                             ]

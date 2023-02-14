@@ -117,8 +117,7 @@ class create_feed(UserControl):
                                                     bgcolor='blue',
                                                     icon_color='white',
                                                     icon_size=40,
-                                                    on_click=lambda _: play(
-                                                        self.username, ID) if ID != None else 0
+                                                    on_click=lambda _: self.playButton(),
                                                 ),
                                                 IconButton(
                                                     icon='skip_next',
@@ -175,6 +174,17 @@ class create_feed(UserControl):
         )
         self.n = 0
         self.getSongs(self.n)
+
+    def playButton(self):
+        if ID != None:
+            play(self.username, ID)
+            self.page.snack_bar = SnackBar(
+                ft.Text(f"Reproduciendo cancion"))
+            self.page.snack_bar.open = True
+            self.page.snack_bar.bgcolor = 'blue'
+            self.page.update()
+        else:
+            pass
 
     def postCommentDisplay(self):
         postComment(self.CommentInput.value, self.username, ID)

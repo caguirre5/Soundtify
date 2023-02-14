@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import date
+import gridfs
 
 client = MongoClient(
     "mongodb+srv://soundtify:soundtify@soundtify.jylzfjo.mongodb.net/?retryWrites=true&w=majority")
@@ -9,6 +10,27 @@ db = client.get_database('Soundtify')
 user = db.Usuarios
 music = db.Musica
 record = db.Reproducciones
+
+
+def setPhoto(username):
+    fs = gridfs.GridFS(db)
+
+    # Obtener referencia
+    document = user.find_one({"username": username})
+    file_id = document["pp"]
+
+    # Abrir archivo con GridFS
+    file = fs.get(file_id)
+    data = file.read()
+
+    # Copia del archivo localmente
+    with open("./assets/image.jpeg", "wb") as f:
+        f.write(data)
+
+
+def authPhoto(username):
+    result = list(user.find_one({"username": username}))
+    return ('pp' in result)
 
 
 def getField(n, datafilter, projection, collection):
@@ -82,7 +104,7 @@ def addSong(username, title, genero, duration):
         songId = getValue('Musica', {
                           "titulo": title, "artista": username, "fecha_de_publicacion": fecha.isoformat()})['_id']
     else:
-        print("El usuario no existe")
+        pass
 
 
 def addUser(nombre, apellido, region, username, email, contrasenia, sexo):
@@ -111,6 +133,11 @@ def addFollower(username):
     user.update_one(user_to_follow, incfollowers)
 
 
+def getCount(collection):
+    coll = db[collection]
+    return coll.count_documents({})
+
+
 def delSong(cancionId):
     DeleteSong = {"_id": ObjectId(cancionId)}
     DeleteRecord = {"IdMusica":  ObjectId(cancionId)}
@@ -123,7 +150,6 @@ def play(username, cancionId):
     insertReproduction = {"IdMusica": ObjectId(
         cancionId), "username": username}
     record.insert_one(insertReproduction)
-    print('cancion {} reproducida por {}'.format(cancionId, username))
 
 
 def timeCast(seconds):
@@ -154,7 +180,6 @@ def deleteUser(username):
     record.delete_many(DeleteUser)
     music.delete_many(DeleteUserSongs)
     user.delete_one(DeleteUser)
-    print('usuario {} eliminado'.format(username))
 
 
 def editUsername(old_username, new_username):
@@ -163,3 +188,300 @@ def editUsername(old_username, new_username):
     changeUsername = {"$set": {"username": new_username}}
 
     user.update_one(user_name, changeUsername)
+
+# Top5 Artistas mas escuchados
+
+
+def top5MyArtists(username):
+    myTopArtists = [
+        {"$match": {"username": username}},
+        {
+            "$lookup":
+            {
+                "from": "Reproducciones",
+                "localField": "username",
+                "foreignField": "username",
+                "pipeline": [
+                    {'$project': {"_id": 0, "IdMusica": 1}}
+                ],
+                "as": "Listners"
+            }
+        },
+        {
+            "$lookup":
+            {
+                "from": "Musica",
+                "localField": "Listners.IdMusica",
+                "foreignField": "_id",
+                "pipeline": [
+                    {"$project": {"artista": 1, "_id": 0}}
+                ],
+                "as": "reps"
+            }
+        },
+        {
+            "$unwind": "$reps"
+        },
+        {
+            "$group":
+            {
+                "_id": "$reps.artista",
+                "count": {"$sum": 1}
+            }
+        },
+        {
+            "$sort": {"count": -1}
+        },
+        {
+            "$limit": 5
+        }
+    ]
+
+    resMyTopArtists = user.aggregate(myTopArtists)
+    return list(resMyTopArtists)
+
+
+def Top5LongSongs():
+    more3Min = music.find({"duracion": {"$gt": 180}}).limit(5)
+    more3Min = list(more3Min)
+    return more3Min
+
+
+def GenreFavoriteMusic():
+    genrePerSex = [
+        {
+            "$lookup":
+            {
+                "from": "Reproducciones",
+                "localField": "username",
+                "foreignField": "username",
+                "pipeline": [
+                    {'$project': {"_id": 0, "IdMusica": 1}}
+                ],
+                "as": "Listners"
+            }
+        },
+        {
+            "$lookup":
+            {
+                "from": "Musica",
+                "localField": "Listners.IdMusica",
+                "foreignField": "_id",
+                "pipeline": [
+                    {"$project": {"genero": 1, "_id": 0, "duracion": 1}}
+                ],
+                "as": "reps"
+            }
+        },
+        {
+            "$unwind": "$reps"
+        },
+        {
+            "$group":
+            {
+                "_id": {"sexo": "$sexo", "genero": "$reps.genero"},
+                "tiempo": {"$sum": "$reps.duracion"}
+            }
+        },
+        {
+            "$group":
+            {
+                "_id": "$_id.sexo",
+                "stats": {
+                    "$push": {
+                        "genero": "$_id.genero",
+                        "tiempo": "$tiempo"
+                    }
+                }
+            }
+        },
+        {
+            "$sort": {"stats.tiempoPromedio": -1}
+        },
+        {
+            "$project":
+            {
+                "_id": 1,
+                "firstGenre": {
+                    "$arrayElemAt": ["$stats", 0]
+                }
+            }
+        }
+    ]
+
+    resGenrePerSex = list(user.aggregate(genrePerSex))
+    sexo = ''
+    res = []
+    for i in range(len(resGenrePerSex)):
+        if resGenrePerSex[i]["_id"] == 0:
+            sexo = 'Hombres'
+        else:
+            sexo = 'Mujeres'
+        firstGenre = (resGenrePerSex[i]["firstGenre"])
+        genre = firstGenre["genero"]
+        tiempo = '{} minutos'.format(timeCast(firstGenre["tiempo"]))
+        temp = {"_id": sexo, "genero": genre, "tiempo": tiempo}
+        res.append(temp)
+
+    return res
+
+
+def Top10MySongs(username):
+    myTopSongs = [
+        {
+            "$lookup":
+            {
+                "from": "Reproducciones",
+                "localField": "_id",
+                "foreignField": "IdMusica",
+                "pipeline": [
+                                {"$match": {"username": username}}
+                ],
+                "as": "reps"
+            }
+        },
+        {
+            "$project":
+            {
+                "titulo": 1,
+                "cantReproducciones":
+                {
+                    "$cond":
+                    {
+                        "if":
+                        {
+                            "$isArray": "$reps"
+                        }, "then":
+                        {
+                            "$size": "$reps"
+                        },
+
+                        "else": 0
+                    }
+                }
+            }
+        },
+        {
+            "$sort": {"cantReproducciones": -1}
+        },
+        {
+            "$limit": 10
+        }
+    ]
+
+    resMyTopSongs = list(music.aggregate(myTopSongs))
+    return resMyTopSongs
+
+
+def Top10SongsRegion(username):
+    region = str(user.find({"username": username}, {"region": 1, "_id": 0}))
+
+    myTopRegion = [
+        # Join con reproducciones para saber quienes escucharon la canción
+        {
+            "$lookup":
+            {
+                "from": "Reproducciones",
+                "localField": "_id",
+                "foreignField": "IdMusica",
+                "pipeline": [
+                    {'$project': {"_id": 0, "username": 1}}
+                ],
+                "as": "Listners"
+            }
+        },
+        # Join de lo anterior con usuarios para saber de dónde son los listners y filtrar por region del usuario
+        {
+            "$lookup":
+            {
+                "from": "Usuarios",
+                "localField": "Listners.username",
+                "foreignField": "username",
+                "pipeline": [
+                    {"$match": {"region": region}},
+                    {"$project": {"region": 1, "_id": 0}}
+                ],
+                "as": "reps"
+            }
+        },
+        # Project del titulo y de la cant de reproducciones de la canción en la región del user.
+        {
+            "$project":
+            {
+                "titulo": 1,
+                "cantReproducciones":
+                {
+                    "$cond":
+                    {
+                        "if":
+                        {
+                            "$isArray": "$reps"
+                        }, "then":
+                        {
+                            "$size": "$reps"
+                        },
+
+                        "else": 0
+                    }
+                }
+            }
+        },
+        {
+            "$sort": {"cantReproducciones": -1}
+        },
+        {
+            "$limit": 10
+        }
+    ]
+
+    resMyTopRegion = list(music.aggregate(myTopRegion))
+    return resMyTopRegion
+
+
+def Top5MyGenre(username):
+    myTopGenres = [
+        {"$match": {"username": username}},
+        {
+            "$lookup":
+            {
+                "from": "Reproducciones",
+                "localField": "username",
+                "foreignField": "username",
+                "pipeline": [
+                                {'$project': {"_id": 0, "IdMusica": 1}}
+                ],
+                "as": "Listners"
+            }
+        },
+        {
+            "$lookup":
+            {
+                "from": "Musica",
+                "localField": "Listners.IdMusica",
+                "foreignField": "_id",
+                "pipeline": [
+                                {"$project": {"genero": 1, "_id": 0}}
+                ],
+                "as": "reps"
+            }
+        },
+        {
+            "$unwind": "$reps"
+        },
+        {
+            "$group":
+            {
+                "_id": "$reps.genero",
+                "count": {"$sum": 1}
+            }
+        },
+        {
+            "$sort": {"count": -1}
+        },
+        {
+            "$limit": 5
+        }
+    ]
+
+    resMyTopGenres = list(user.aggregate(myTopGenres))
+    return resMyTopGenres

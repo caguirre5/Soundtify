@@ -5,6 +5,7 @@ from flet import animation, alignment, border, transform, padding
 
 from src.feed import create_feed
 from src.profilepage import create_page
+from src.statspage import create_statspage
 
 
 class create_homepage(UserControl):
@@ -83,7 +84,7 @@ class create_homepage(UserControl):
             offset=transform.Offset(0, 0),
             animate_offset=self.animation_style,
             bgcolor='#15191E',
-            content=Text('PAGE 2', size=50)
+            content=create_statspage(self.page, self.userID)
         )
 
         page3 = Container(
@@ -95,9 +96,9 @@ class create_homepage(UserControl):
         )
 
         switch_control = {
-            'page1': page1,
-            'page2': page2,
             'page3': page3,
+            'page2': page2,
+            'page1': page1,
         }
 
         indicator = Container(
@@ -108,7 +109,6 @@ class create_homepage(UserControl):
         )
 
         def switch_page(e, point):
-            print(point)
             for page in switch_control:
                 switch_control[page].offset.x = 2
                 switch_control[page].update()
@@ -162,9 +162,9 @@ class create_homepage(UserControl):
                         expand=True,
                         content=Stack(
                             controls=[
+                                page3,
                                 page2,
                                 page1,
-                                page3,
 
                             ]
                         )

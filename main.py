@@ -37,7 +37,6 @@ def main(page: ft.Page):
     }
 
     def route_change(route):
-        print(page.route)
         split_cadena = page.route.split("-")
         ruta = split_cadena[0]
         global userID

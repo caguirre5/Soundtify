@@ -103,8 +103,6 @@ class create_post(UserControl):
                                 ),
                                 Container(
                                     width=40,
-                                    on_click=lambda _: print(
-                                        'self.setLikesCount()'),
                                     content=Column([
                                         Icon(
                                             # Icon(icons.THUMB_UP_SHARP),

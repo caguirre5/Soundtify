@@ -4,7 +4,8 @@ from flet import border_radius, alignment, padding, margin, border_radius
 import flet as ft
 
 from src.components import InputText, Button
-from data_management import authentication
+from data_management import authentication, authPhoto
+from photoGenerator import CreatePhoto
 
 
 class create_login(UserControl):
