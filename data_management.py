@@ -185,9 +185,13 @@ def deleteUser(username):
 def editUsername(old_username, new_username):
 
     user_name = {"username": old_username}
-    changeUsername = {"$set": {"username": new_username}}
+    user_artist = {"artista":old_username}
+    changeUsername = {"$set":{"username": new_username}}
+    changeArtista = {"$set":{"artista": new_username}}
 
     user.update_one(user_name, changeUsername)
+    music.update_many(user_artist,changeArtista )
+    record.update_many(user_name ,changeUsername  )
 
 # Top5 Artistas mas escuchados
 
